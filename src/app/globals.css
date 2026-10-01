@@ -271,6 +271,23 @@
   animation: pulse-soft 6s ease-in-out infinite;
 }
 
+/* Floating WhatsApp widget — one-shot entrance (wrapper only, so the inner
+   <a> keeps its own hover/active transforms) */
+@keyframes wa-float-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.wa-float {
+  animation: wa-float-in 0.5s cubic-bezier(0.21, 1.02, 0.73, 1) 0.7s both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
