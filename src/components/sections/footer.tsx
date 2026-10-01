@@ -1,9 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { Phone, Mail, MapPin, Globe, MessageCircle, Share2, ArrowUpRight } from "lucide-react";
-import { NAV_LINKS, CONTACT_EMAIL, SITE_NAME, COMPANY_LOCATION, CONTACT_PHONE_1, CONTACT_PHONE_2 } from "@/lib/constants";
+import { Phone, Mail, MapPin, ArrowUpRight } from "lucide-react";
+import {
+  NAV_LINKS,
+  CONTACT_EMAIL,
+  SITE_NAME,
+  COMPANY_LOCATION,
+  CONTACT_PHONE_1,
+  CONTACT_PHONE_2,
+  WHATSAPP_NUMBER,
+  LINKEDIN_URL,
+  PIGIECORE_URL,
+} from "@/lib/constants";
 import { Logo } from "@/components/ui/logo";
+import { LinkedInIcon, WhatsAppIcon } from "@/components/ui/icons";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -27,16 +38,24 @@ export function Footer() {
                 research, and strategic management.
               </p>
               <div className="flex gap-3">
-                {[Globe, MessageCircle, Share2].map((Icon, i) => (
-                  <a
-                    key={i}
-                    href="#"
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20 transition-all hover:bg-white/25 hover:-translate-y-0.5"
-                    aria-label={Icon.name}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </a>
-                ))}
+                <a
+                  href={LINKEDIN_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Brimus Consultancy on LinkedIn"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20 transition-all hover:bg-white/25 hover:-translate-y-0.5"
+                >
+                  <LinkedInIcon className="h-4 w-4" />
+                </a>
+                <a
+                  href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Chat with Brimus Consultancy on WhatsApp"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/20 transition-all hover:bg-white/25 hover:-translate-y-0.5"
+                >
+                  <WhatsAppIcon className="h-4 w-4" />
+                </a>
               </div>
             </div>
 
@@ -137,6 +156,19 @@ export function Footer() {
               </Link>
             </div>
           </div>
+
+          {/* Credit */}
+          <p className="mt-6 text-center text-xs text-cyan-100/60">
+            Crafted with <span aria-hidden="true">❤️</span> &amp; Care by{" "}
+            <a
+              href={PIGIECORE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-cyan-100/80 underline-offset-4 transition-colors hover:text-white hover:underline"
+            >
+              Pigiecore Solutions
+            </a>
+          </p>
         </div>
       </div>
     </footer>

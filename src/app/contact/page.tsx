@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send, Navigation } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -14,6 +14,7 @@ import { BackButton } from "@/components/ui/back-button";
 import { Combobox } from "@/components/ui/combobox";
 import { Toast } from "@/components/sections/toast";
 import { services } from "@/lib/data";
+import { GOOGLE_MAPS_EMBED_URL, GOOGLE_MAPS_URL } from "@/lib/constants";
 
 // Zod schema for validation
 const inquirySchema = z.object({
@@ -169,14 +170,26 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Map placeholder */}
-              <div className="mt-6 rounded-xl overflow-hidden border border-border shadow-card">
-                <div className="w-full aspect-video bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="h-12 w-12 text-primary/30 mx-auto mb-2" />
-                    <p className="text-sm text-muted-foreground">Nairobi, Kenya</p>
-                    <p className="text-xs text-muted-foreground/50 mt-1">Map loading placeholder</p>
-                  </div>
+              {/* Google Map */}
+              <div className="mt-6 overflow-hidden rounded-xl border border-border shadow-card">
+                <div className="relative aspect-video w-full">
+                  <iframe
+                    title="Brimus Consultancy Ltd on Google Maps"
+                    src={GOOGLE_MAPS_EMBED_URL}
+                    className="absolute inset-0 h-full w-full border-0"
+                    loading="lazy"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                  <a
+                    href={GOOGLE_MAPS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-background/95 px-3 py-1.5 text-xs font-semibold text-foreground shadow-lg ring-1 ring-border backdrop-blur transition-colors hover:bg-secondary"
+                  >
+                    <Navigation className="h-3.5 w-3.5 text-primary" />
+                    Get directions
+                  </a>
                 </div>
               </div>
             </motion.div>
