@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Tailwind v4 defaults `dark:` to prefers-color-scheme; this site's theme is
+   driven by the next-themes class on <html>, so bind the variant to that. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ════════════════════════════════════════════════════════════════════
    BRIMUS CONSULTANCY — Ultra-Modern Cyan & White Design System
    ・White 60% ・ Cyan background ・ Fonts: White / Grey / Black
@@ -54,8 +58,10 @@
 }
 
 /* ── Dark theme ────────────────────────────────────────────────── */
+/* :root:not(.light) so system-dark users get dark vars before hydration,
+   while an explicit light choice (next-themes class) still wins. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background: #083344;
     --foreground: #f2fdff;
     --card: #0d4558;

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { BackButton } from "@/components/ui/back-button";
 import { SectionHeader } from "@/components/sections/stat-section";
 import { ServiceCard } from "@/components/sections/service-card";
 import { ServiceDetailDialog } from "@/components/sections/service-detail-dialog";
@@ -41,6 +42,7 @@ export default function ServicesPage() {
           <div className="animate-pulse-soft absolute -bottom-24 -right-10 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-32 sm:px-6 md:pb-16 md:pt-44 lg:px-8">
+          <BackButton className="mb-6" />
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}

@@ -127,8 +127,8 @@ export function Header() {
                 className={cn(
                   "flex items-center rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                   pathname === link.href
-                    ? "bg-cyan-50 text-cyan-700"
-                    : "text-slate-600 hover:bg-cyan-50/60 hover:text-cyan-700",
+                    ? "bg-cyan-50 text-cyan-700 dark:bg-cyan-50/10 dark:text-cyan-300"
+                    : "text-slate-600 hover:bg-cyan-50/60 hover:text-cyan-700 dark:text-slate-300 dark:hover:bg-cyan-50/10 dark:hover:text-cyan-200",
                 )}
               >
                 {link.label}

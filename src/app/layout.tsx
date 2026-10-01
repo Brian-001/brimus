@@ -12,7 +12,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Brimus Consultancy Ltd – Leading Consulting Firm in Africa",
+    default: "Brimus Consultancy Ltd - Leading Consulting Firm in Africa",
     template: "%s | Brimus Consultancy Ltd",
   },
   description:
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   authors: [{ name: "Brimus Consultancy Ltd" }],
   creator: "Brimus Consultancy Ltd",
   openGraph: {
-    title: "Brimus Consultancy Ltd – Leading Consulting Firm in Africa",
+    title: "Brimus Consultancy Ltd - Leading Consulting Firm in Africa",
     description:
       "Professional audit, accountancy, financial consultancy, tax, research, and strategic management services across Africa.",
     url: "https://brimus.co.ke",

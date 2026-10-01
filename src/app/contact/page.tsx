@@ -3,21 +3,16 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { SectionHeader } from "@/components/sections/stat-section";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { BackButton } from "@/components/ui/back-button";
+import { Combobox } from "@/components/ui/combobox";
 import { Toast } from "@/components/sections/toast";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
 import { services } from "@/lib/data";
 
 // Zod schema for validation
@@ -32,7 +27,9 @@ const inquirySchema = z.object({
     .min(8, { message: "Phone number must be at least 8 characters" })
     .max(20, { message: "Phone number must not exceed 20 characters" }),
   company: z.string().max(200, { message: "Company name must not exceed 200 characters" }).optional().or(z.literal("")),
-  service: z.string().min(1, { message: "Please select a service of interest" }),
+  services: z
+    .array(z.string())
+    .min(1, { message: "Please select at least one service of interest" }),
   message: z
     .string()
     .min(10, { message: "Message must be at least 10 characters" })
@@ -50,11 +47,15 @@ export default function ContactPage() {
     handleSubmit,
     reset,
     setValue,
+    control,
     formState: { errors },
   } = useForm<InquiryFormData>({
     resolver: zodResolver(inquirySchema),
+    defaultValues: { services: [] },
     mode: "onChange",
   });
+
+  const selectedServices = useWatch({ control, name: "services" }) ?? [];
 
   const onSubmit = async (data: InquiryFormData) => {
     setIsSubmitting(true);
@@ -90,6 +91,7 @@ export default function ContactPage() {
           <div className="animate-pulse-soft absolute -bottom-24 -right-10 h-72 w-72 rounded-full bg-cyan-300/20 blur-3xl" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-32 sm:px-6 md:pb-20 md:pt-44 lg:px-8">
+          <BackButton className="mb-6" />
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -134,7 +136,7 @@ export default function ContactPage() {
                   <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
                     <h4 className="text-sm font-semibold text-foreground">Office Address</h4>
-                    <p className="text-sm text-muted-foreground">{`Nairobi, Kenya`}</p>
+                    <p className="text-sm text-muted-foreground">{`Mang'u Road, Thika, Kenya`}</p>
                   </div>
                 </div>
 
@@ -142,8 +144,8 @@ export default function ContactPage() {
                   <Phone className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                   <div>
                     <h4 className="text-sm font-semibold text-foreground">Phone</h4>
-                    <a href="tel:+254700000000" className="text-sm text-muted-foreground transition-colors hover:text-primary">
-                      +254 700 000 000
+                    <a href="tel:+254722366503" className="text-sm text-muted-foreground transition-colors hover:text-primary">
+                      +254 722 366 503 || +254 705 213 352
                     </a>
                   </div>
                 </div>
@@ -224,26 +226,22 @@ export default function ContactPage() {
                     error={errors.company?.message}
                   />
 
-                  <div className="w-full">
-                    <label className="mb-1.5 block text-sm font-medium text-foreground">
-                      Service of Interest
-                    </label>
-                    <Select onValueChange={(v) => setValue("service", v, { shouldValidate: true })}>
-                      <SelectTrigger className="focus:ring-ring flex h-10 w-full items-center justify-between rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                        <SelectValue placeholder="Select a service" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {services.map((s) => (
-                          <SelectItem key={s.id} value={s.title}>
-                            {s.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.service?.message && (
-                      <p className="mt-1 text-xs text-destructive">{errors.service.message}</p>
-                    )}
-                  </div>
+                  <Combobox
+                    label="Service of Interest"
+                    placeholder="Select one or more services"
+                    options={services.map((s) => ({
+                      value: s.title,
+                      label: s.title,
+                    }))}
+                    value={selectedServices}
+                    onChange={(v) =>
+                      setValue("services", v, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      })
+                    }
+                    error={errors.services?.message}
+                  />
 
                   <Textarea
                     label="Message"
