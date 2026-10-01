@@ -27,6 +27,6 @@ export interface InquiryFormData {
   email: string;
   phone: string;
   company: string;
-  service: string;
+  services: string[];
   message: string;
 }

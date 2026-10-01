@@ -10,8 +10,13 @@ export async function POST(request: NextRequest) {
     console.log("===================");
 
     // Basic validation
-    const { fullName, email, phone, service, message } = body;
-    if (!fullName || !email || !phone || !service || !message) {
+    const { fullName, email, phone, services, service, message } = body;
+    const serviceList: string[] = Array.isArray(services)
+      ? services
+      : service
+        ? [service]
+        : [];
+    if (!fullName || !email || !phone || serviceList.length === 0 || !message) {
       return NextResponse.json(
         { message: "All required fields must be filled" },
         { status: 400 },

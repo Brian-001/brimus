@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Phone, Mail, MapPin, Globe, MessageCircle, Share2, ArrowUpRight } from "lucide-react";
-import { NAV_LINKS, CONTACT_EMAIL, CONTACT_PHONE, SITE_NAME, COMPANY_LOCATION } from "@/lib/constants";
+import { NAV_LINKS, CONTACT_EMAIL, SITE_NAME, COMPANY_LOCATION, CONTACT_PHONE_1, CONTACT_PHONE_2 } from "@/lib/constants";
 import { Logo } from "@/components/ui/logo";
 
 export function Footer() {
@@ -93,7 +93,7 @@ export function Footer() {
               <ul className="space-y-3.5">
                 <li className="flex items-start gap-3 text-sm text-cyan-50/80">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
-                  {COMPANY_LOCATION}, Kenya
+                  {COMPANY_LOCATION}
                 </li>
                 <li className="flex items-center gap-3 text-sm text-cyan-50/80">
                   <Mail className="h-4 w-4 shrink-0 text-cyan-300" />
@@ -104,13 +104,19 @@ export function Footer() {
                     {CONTACT_EMAIL}
                   </a>
                 </li>
-                <li className="flex items-center gap-3 text-sm text-cyan-50/80">
-                  <Phone className="h-4 w-4 shrink-0 text-cyan-300" />
+                <li className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-1 text-sm text-cyan-50/80">
+                  <Phone className="h-4 w-4 shrink-0 text-cyan-300 row-span-2 self-center" />
                   <a
-                    href={`tel:${CONTACT_PHONE}`}
+                    href={`tel:${CONTACT_PHONE_1}`}
                     className="transition-colors hover:text-white"
                   >
-                    {CONTACT_PHONE}
+                    {CONTACT_PHONE_1}
+                  </a>
+                  <a
+                    href={`tel:${CONTACT_PHONE_2}`}
+                    className="transition-colors hover:text-white"
+                  >
+                    {CONTACT_PHONE_2}
                   </a>
                 </li>
               </ul>
