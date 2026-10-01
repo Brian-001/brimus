@@ -3,16 +3,18 @@ import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function BackButton({
+  href = "/",
   className,
   label = "Back",
 }: {
+  href?: string;
   className?: string;
   label?: string;
 }) {
   return (
     <Link
-      href="/"
-      aria-label="Back to home"
+      href={href}
+      aria-label={href === "/" ? "Back to home" : `Back to ${label}`}
       className={cn(
         "group inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2",
         "text-sm font-semibold text-white backdrop-blur-sm",

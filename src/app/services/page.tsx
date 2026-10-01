@@ -97,6 +97,7 @@ export default function ServicesPage() {
             {filtered.map((service, i) => (
               <ServiceCard
                 key={service.id}
+                id={service.id}
                 icon={iconMap[service.icon]}
                 title={service.title}
                 description={service.description}

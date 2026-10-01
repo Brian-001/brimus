@@ -11,6 +11,7 @@ interface ServiceCardProps {
   description: string;
   details?: string[];
   href?: string;
+  id?: string;
   index: number;
   variant?: "default" | "minimal";
   onReadMore?: () => void;
@@ -22,6 +23,7 @@ export function ServiceCard({
   description,
   details,
   href,
+  id,
   index,
   variant = "default",
   onReadMore,
@@ -30,11 +32,12 @@ export function ServiceCard({
 
   return (
     <motion.div
+      id={id}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="h-full"
+      className="h-full scroll-mt-28"
     >
       <div
         className={cn(

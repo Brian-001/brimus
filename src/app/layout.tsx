@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import PageWrapper from "@/components/page-wrapper";
 import { WhatsAppWidget } from "@/components/sections/whatsapp-widget";
+import { OrganizationJsonLd } from "@/components/seo/json-ld";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,11 +14,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Brimus Consultancy Ltd - Leading Consulting Firm in Africa",
+    default: "Brimus Consultancy | Audit, Tax & Advisory Services in Kenya",
     template: "%s | Brimus Consultancy Ltd",
   },
   description:
-    "Brimus Consultancy Ltd is a leading Kenyan consulting firm specializing in audit, accountancy, financial consultancy, tax, research, policy analysis, and strategic management. Trusted by NGOs, donors, and private sector clients across Africa.",
+    "Brimus Consultancy provides audit, tax, advisory, research and strategic management services to businesses, NGOs and institutions in Kenya and across Africa.",
   keywords: [
     "Brimus Consultancy",
     "audit Kenya",
@@ -31,14 +32,14 @@ export const metadata: Metadata = {
   authors: [{ name: "Brimus Consultancy Ltd" }],
   creator: "Brimus Consultancy Ltd",
   openGraph: {
-    title: "Brimus Consultancy Ltd - Leading Consulting Firm in Africa",
+    title: "Brimus Consultancy | Audit, Tax & Advisory Services in Kenya",
     description:
-      "Professional audit, accountancy, financial consultancy, tax, research, and strategic management services across Africa.",
+      "Audit, tax, advisory, research and strategic management services for businesses, NGOs and institutions in Kenya and across Africa.",
     url: "https://brimus.co.ke",
     siteName: "Brimus Consultancy Ltd",
     images: [
       {
-        url: "/images/og-image.jpg",
+        url: "/images/og-image.png",
         width: 1200,
         height: 630,
         alt: "Brimus Consultancy Ltd",
@@ -49,9 +50,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Brimus Consultancy Ltd",
+    title: "Brimus Consultancy | Audit, Tax & Advisory Services in Kenya",
     description:
-      "Leading Kenyan consulting firm for audit, accountancy, financial consultancy, tax, and strategic management.",
+      "Audit, tax, advisory, research and strategic management services in Kenya and across Africa.",
   },
   robots: {
     index: true,
@@ -90,6 +91,7 @@ export default function RootLayout({
           </PageWrapper>
           <WhatsAppWidget />
         </ThemeProvider>
+        <OrganizationJsonLd />
       </body>
     </html>
   );

@@ -1,7 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, TrendingUp, Building2, Globe, Award, ShieldCheck, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  TrendingUp,
+  Building2,
+  Globe,
+  Award,
+  ShieldCheck,
+  HeartHandshake,
+  Landmark,
+  PiggyBank,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SectionHeader, StatCard } from "@/components/sections/stat-section";
@@ -9,14 +19,39 @@ import { ServiceCard } from "@/components/sections/service-card";
 import { services, iconMap } from "@/lib/data";
 import { teamMembers } from "@/lib/data";
 import { experiences } from "@/lib/data";
-import { SITE_TAGLINE } from "@/lib/constants";
-import { Badge } from "@/components/ui/badge";
 
 const stats = [
   { value: "20+", label: "Years of Experience" },
   { value: "150+", label: "Projects Delivered" },
   { value: "50+", label: "Clients Served" },
   { value: "25+", label: "Countries Reached" },
+];
+
+const whoWeServe = [
+  {
+    icon: HeartHandshake,
+    title: "NGOs & Development Organisations",
+    description:
+      "Financial management, donor compliance, monitoring & evaluation and programme advisory.",
+  },
+  {
+    icon: Building2,
+    title: "Private Sector",
+    description:
+      "Audit, tax, due diligence, strategy and financial advisory for growing businesses.",
+  },
+  {
+    icon: Landmark,
+    title: "Government & Public Institutions",
+    description:
+      "Public financial management, policy analysis and institutional advisory.",
+  },
+  {
+    icon: PiggyBank,
+    title: "SACCOs & Financial Institutions",
+    description:
+      "Audit, risk, governance and IT assurance for member-based institutions.",
+  },
 ];
 
 const highlights = [
@@ -69,23 +104,21 @@ export default function HomePage() {
             transition={{ duration: 0.7, ease: "easeOut" }}
             className="max-w-3xl"
           >
-            <Badge className="mb-6 bg-white/10 px-4 py-1.5 text-cyan-100 ring-1 ring-white/25 backdrop-blur-sm">
-              <Sparkles className="mr-1.5 h-3.5 w-3.5 text-cyan-300" />
-              {SITE_TAGLINE}
-            </Badge>
-            <h1 className="mb-6 text-4xl font-extrabold leading-tight tracking-tight text-white drop-shadow-sm md:text-5xl lg:text-6xl">
-              Trusted Advisory for Africa&apos;s Most
-              <span className="text-gradient block">Critical Decisions</span>
+            <h1 className="mb-4 text-4xl font-extrabold leading-tight tracking-tight text-white drop-shadow-sm md:text-5xl lg:text-6xl">
+              Brimus Consultancy
             </h1>
+            <p className="mb-4 max-w-2xl text-xl font-semibold text-cyan-100 md:text-2xl">
+              Professional expertise for complex business decisions.
+            </p>
             <p className="mb-10 max-w-2xl text-lg leading-relaxed text-cyan-50/80 md:text-xl">
-              Brimus Consultancy delivers world-class audit, tax, advisory,
-              and strategic management services to organizations across Africa.
-              Integrity, expertise, and value for money is guaranteed.
+              Audit, tax, advisory, research and strategic management services
+              for businesses, NGOs, development organisations and public
+              institutions across Africa.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/contact">
                 <Button size="xl" variant="light" className="rounded-full">
-                  Request a Consultation <ArrowRight className="h-4 w-4" />
+                  Talk to an Advisor <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
               <Link href="/services">
@@ -94,27 +127,58 @@ export default function HomePage() {
                   variant="outline"
                   className="rounded-full border-white/30 bg-white/5 text-white backdrop-blur-sm hover:border-white/60 hover:bg-white/15 hover:text-white"
                 >
-                  Explore Services
+                  Our Services
                 </Button>
               </Link>
             </div>
           </motion.div>
         </div>
 
-        {/* Trust bar */}
-        <div className="relative mx-auto max-w-7xl px-4 pb-10 pt-2 sm:px-6 lg:px-8">
+        {/* Trust strip */}
+        <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-2 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            className="rounded-2xl border border-white/15 bg-white/10 p-6 shadow-2xl shadow-cyan-950/30 backdrop-blur-xl sm:p-8"
+            className="grid grid-cols-2 gap-8 border-t border-white/25 pt-8 md:grid-cols-4 md:divide-x md:divide-white/20"
           >
-            <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-              {stats.map((stat, i) => (
-                <StatCard key={stat.label} {...stat} index={i} inverse />
-              ))}
-            </div>
+            {stats.map((stat, i) => (
+              <StatCard key={stat.label} {...stat} index={i} inverse />
+            ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* Who We Serve */}
+      <section className="section-padding bg-background">
+        <div className="mx-auto max-w-7xl">
+          <SectionHeader
+            label="Who We Serve"
+            title="Who We Work With"
+            description="We support organisations that answer to donors, boards, regulators and members — with the rigour those audiences demand."
+          />
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+            {whoWeServe.map((item, i) => (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.45, delay: i * 0.08 }}
+                className="group bg-card p-6 transition-colors duration-300 hover:bg-secondary/60 md:p-7"
+              >
+                <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-secondary text-primary ring-1 ring-primary/15 transition-colors duration-300 group-hover:bg-primary group-hover:text-white">
+                  <item.icon className="h-5 w-5" />
+                </div>
+                <h3 className="mb-2 text-base font-semibold text-foreground md:text-lg">
+                  {item.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {item.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -247,8 +311,16 @@ export default function HomePage() {
                   {member.role}
                 </p>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  {member.bio.slice(0, 120)}...
+                  {member.bio}
                 </p>
+                {member.slug && (
+                  <Link
+                    href={`/about/${member.slug}`}
+                    className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-primary transition-all hover:gap-2.5"
+                  >
+                    View profile <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
               </motion.div>
             ))}
           </div>
