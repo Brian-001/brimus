@@ -96,13 +96,17 @@ export const iconMap: Record<string, LucideIcon> = {
 export const teamMembers: TeamMember[] = [
   {
     name: "Onesmus Murimi",
+    slug: "onesmus-murimi",
     role: "Founder & Lead Partner",
     bio: "Chartered Accountant with over 20 years of experience in audit, tax advisory, and strategic financial management. Former senior manager at a Big 4 firm, Onesmus brings deep expertise across East African markets and international regulatory frameworks.",
+    expertise: ["Audit", "Tax Advisory", "Strategic Financial Management"],
   },
   {
     name: "Brian Kimathi",
+    slug: "brian-kimathi",
     role: "Co-Founder & Director",
     bio: "An experienced financial consultant and researcher specializing in policy analysis, market research, and development sector advisory. Brian has led engagements for USAID, UNDP, World Bank, and major SACCOs across Kenya and East Africa.",
+    expertise: ["Policy Analysis", "Market Research", "Development Sector Advisory"],
   },
   {
     name: "Senior Associates",
@@ -116,6 +120,8 @@ export const experiences: Experience[] = [
     id: "1",
     client: "USAID Kenya",
     sector: "Development / NGO",
+    location: "Kenya",
+    services: ["Audit", "Financial Advisory"],
     description:
       "Provided comprehensive audit and financial advisory services for multiple USAID-funded programs across health, education, and economic growth sectors.",
   },
@@ -123,6 +129,12 @@ export const experiences: Experience[] = [
     id: "2",
     client: "UNDP East Africa",
     sector: "Development / NGO",
+    location: "East Africa",
+    services: [
+      "Financial Management Assessments",
+      "M&E Framework Development",
+      "Policy Analysis",
+    ],
     description:
       "Delivered financial management assessments, M&E framework development, and policy analysis for UNDP regional programs.",
   },
@@ -130,6 +142,8 @@ export const experiences: Experience[] = [
     id: "3",
     client: "World Bank Group",
     sector: "International Development",
+    location: "East Africa",
+    services: ["Due Diligence", "Feasibility Studies"],
     description:
       "Conducted due diligence and feasibility studies for infrastructure and private sector development projects in East Africa.",
   },
@@ -137,6 +151,8 @@ export const experiences: Experience[] = [
     id: "4",
     client: "Major SACCOs in Kenya",
     sector: "Financial Services",
+    location: "Kenya",
+    services: ["Statutory Audit", "Internal Audit", "IT Audit"],
     description:
       "Delivered statutory audits, internal audit reviews, and IT audit services for savings and credit cooperatives with assets exceeding KSh 5 billion.",
   },
@@ -144,6 +160,8 @@ export const experiences: Experience[] = [
     id: "5",
     client: "Leading Kenyan Corporations",
     sector: "Private Sector",
+    location: "Kenya",
+    services: ["Tax Planning", "Strategic Advisory", "Compliance"],
     description:
       "Provided tax planning, strategic advisory, and compliance services to multinational and local corporations across manufacturing, real estate, and financial services.",
   },
@@ -151,6 +169,12 @@ export const experiences: Experience[] = [
     id: "6",
     client: "Government Agencies",
     sector: "Public Sector",
+    location: "Kenya",
+    services: [
+      "Policy Drafting",
+      "Regulatory Compliance Reviews",
+      "Public Financial Management",
+    ],
     description:
       "Supported policy drafting, regulatory compliance reviews, and public financial management reforms for Kenyan government entities.",
   },

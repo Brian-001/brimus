@@ -1,5 +1,7 @@
 export const SITE_NAME = "Brimus Consultancy Ltd";
 export const SITE_TAGLINE = "Leading Consulting Firm in Africa";
+/** Production origin. Used for sitemap, robots, JSON-LD and Open Graph. */
+export const SITE_URL = "https://brimus.co.ke";
 export const COMPANY_FOUNDERS = "Onesmus Murimi & Brian Kimathi";
 export const COMPANY_LOCATION = "Mang'u Road, Thika, Kenya";
 
@@ -29,5 +31,7 @@ export const NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
   { href: "/experience", label: "Experience" },
+  { href: "/about/team", label: "Team" },
+  { href: "/insights", label: "Insights" },
   { href: "/contact", label: "Contact" },
 ];

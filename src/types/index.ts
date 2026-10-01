@@ -1,8 +1,10 @@
 export interface TeamMember {
   name: string;
+  slug?: string;
   role: string;
   bio: string;
   image?: string;
+  expertise?: string[];
 }
 
 export interface Service {
@@ -20,6 +22,11 @@ export interface Experience {
   sector: string;
   description: string;
   year?: string;
+  location?: string;
+  services?: string[];
+  challenge?: string;
+  approach?: string;
+  outcome?: string;
 }
 
 export interface InquiryFormData {

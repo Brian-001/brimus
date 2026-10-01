@@ -107,13 +107,60 @@ export default function ExperiencePage() {
                   <span className="text-xs font-semibold tracking-wide uppercase text-accent">
                     {exp.sector}
                   </span>
+                  {exp.location && (
+                    <span className="ml-auto text-xs font-medium text-muted-foreground">
+                      {exp.location}
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-lg font-semibold mb-3 text-foreground">
                   {exp.client}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">
                   {exp.description}
                 </p>
+                {exp.services && exp.services.length > 0 && (
+                  <ul className="flex flex-wrap gap-1.5">
+                    {exp.services.map((service) => (
+                      <li
+                        key={service}
+                        className="rounded-full bg-secondary px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground ring-1 ring-border"
+                      >
+                        {service}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {exp.challenge && (
+                  <div className="mt-4 border-t border-border pt-4">
+                    <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-accent">
+                      Challenge
+                    </h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {exp.challenge}
+                    </p>
+                  </div>
+                )}
+                {exp.approach && (
+                  <div className="mt-3">
+                    <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-accent">
+                      Approach
+                    </h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {exp.approach}
+                    </p>
+                  </div>
+                )}
+                {exp.outcome && (
+                  <div className="mt-3">
+                    <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-accent">
+                      Outcome
+                    </h4>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {exp.outcome}
+                    </p>
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>
