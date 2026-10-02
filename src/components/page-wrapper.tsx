@@ -5,9 +5,19 @@ import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 import { Header } from "@/components/sections/header";
 import { Footer } from "@/components/sections/footer";
+import { WhatsAppWidget } from "@/components/sections/whatsapp-widget";
 
 export default function PageWrapper({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const isAdminRoute =
+    pathname === "/login" || pathname.startsWith("/dashboard");
+
+  // Dashboard routes have their own persistent shell (header/sidebar). Wrapping
+  // them in a keyed AnimatePresence would unmount and animate the whole shell
+  // on every navigation, so they render without the page-transition wrapper.
+  if (isAdminRoute) {
+    return <>{children}</>;
+  }
 
   return (
     <>
@@ -24,6 +34,7 @@ export default function PageWrapper({ children }: { children: ReactNode }) {
         </motion.div>
       </AnimatePresence>
       <Footer />
+      <WhatsAppWidget />
     </>
   );
 }

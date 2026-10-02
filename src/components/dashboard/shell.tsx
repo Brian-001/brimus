@@ -1,0 +1,189 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { useQuery, useMutation } from "convex/react";
+import { cn } from "@/lib/utils";
+import { api } from "@convex/_generated/api";
+import { buttonVariants } from "@/components/ui/button";
+import { useAuth } from "@/lib/use-auth";
+import { ForcePasswordChange } from "@/components/dashboard/force-password-change";
+import { ROLE_LABELS } from "@convex/roles";
+import {
+  BarChart3,
+  FileText,
+  Inbox,
+  ExternalLink,
+  LogOut,
+  ShieldCheck,
+  User,
+  Users,
+} from "lucide-react";
+
+const NAV_ITEMS = [
+  { href: "/dashboard", label: "Overview", icon: BarChart3, exact: true },
+  { href: "/dashboard/inquires", label: "Inquiries", icon: Inbox, exact: false },
+  { href: "/dashboard/insights", label: "Insights", icon: FileText, exact: false },
+  { href: "/dashboard/users", label: "Users", icon: Users, exact: true },
+  { href: "/dashboard/profile", label: "Profile", icon: User, exact: true },
+];
+
+function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname();
+
+  return (
+    <>
+      {NAV_ITEMS.map((item) => {
+        const active = item.exact
+          ? pathname === item.href
+          : pathname.startsWith(item.href);
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              active
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+            )}
+          >
+            <Icon className="h-4 w-4 shrink-0" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+
+export function DashboardShell({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { token, ready, logout, clearToken } = useAuth();
+  const me = useQuery(api.users.me, ready && token ? { token } : "skip");
+  const logoutMutation = useMutation(api.users.logout);
+  const [signingOut, setSigningOut] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
+
+  const authorized = ready && !!token && me !== undefined && me !== null;
+  const denied = ready && (!token || me === null);
+
+  useEffect(() => {
+    if (denied && !signingOut) router.replace("/login");
+  }, [denied, router, signingOut]);
+
+  // The content column has its own scrollbar — reset it on navigation.
+  useEffect(() => {
+    mainRef.current?.scrollTo(0, 0);
+  }, [pathname]);
+
+  const onSignOut = async () => {
+    setSigningOut(true);
+    try {
+      if (token) await logoutMutation({ token });
+    } catch {
+      // Session may already be invalid — clear locally regardless.
+    }
+    clearToken();
+    logout();
+  };
+
+  if (!authorized) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-sm text-muted-foreground">Checking access…</p>
+      </main>
+    );
+  }
+
+  if (me!.mustChangePassword) {
+    return (
+      <ForcePasswordChange
+        token={token!}
+        user={me!}
+        onSignOut={onSignOut}
+      />
+    );
+  }
+
+  return (
+    <div className="flex h-dvh overflow-hidden bg-background">
+      {/* Desktop sidebar — fixed rail with its own scrollbar */}
+      <aside className="hidden w-52 shrink-0 flex-col border-r border-border bg-card md:flex">
+        <div className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <ShieldCheck className="h-5 w-5" />
+            </span>
+            <span className="text-sm font-bold text-foreground">Brimus Admin</span>
+          </Link>
+        </div>
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+          <NavLinks />
+        </nav>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <header className="shrink-0 border-b border-border bg-card/95 backdrop-blur">
+          <div className="flex h-14 items-center gap-3 px-4">
+            {/* Mobile brand (desktop shows it in the sidebar) */}
+            <Link href="/dashboard" className="flex items-center gap-2 md:hidden">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <ShieldCheck className="h-5 w-5" />
+              </span>
+              <span className="text-sm font-bold text-foreground">Brimus Admin</span>
+            </Link>
+
+            <div className="ml-auto flex items-center gap-2">
+              <Link
+                href="/dashboard/profile"
+                title="Your profile"
+                className="hidden text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline"
+              >
+                {me!.name}
+                <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium uppercase text-primary ring-1 ring-border">
+                  {ROLE_LABELS[me!.role] ?? me!.role}
+                </span>
+              </Link>
+              <Link
+                href="/"
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  "text-muted-foreground",
+                )}
+              >
+                <ExternalLink className="h-4 w-4" />{" "}
+                <span className="hidden sm:inline">View site</span>
+              </Link>
+              <button
+                type="button"
+                onClick={onSignOut}
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "sm" }),
+                  "text-muted-foreground hover:text-red-600",
+                )}
+              >
+                <LogOut className="h-4 w-4" />{" "}
+                <span className="hidden sm:inline">Sign out</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile nav — horizontally scrollable */}
+          <nav className="flex gap-1 overflow-x-auto border-t border-border px-3 py-2 md:hidden">
+            <NavLinks />
+          </nav>
+        </header>
+
+        {/* Page content — scrolls independently of the sidebar */}
+        <main ref={mainRef} className="min-w-0 flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-7xl px-4 py-6">{children}</div>
+        </main>
+      </div>
+    </div>
+  );
+}
