@@ -3,8 +3,8 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import PageWrapper from "@/components/page-wrapper";
-import { WhatsAppWidget } from "@/components/sections/whatsapp-widget";
 import { OrganizationJsonLd } from "@/components/seo/json-ld";
+import { ConvexProviderClient } from "@/components/convex-provider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -86,10 +86,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <PageWrapper>
-            {children}
-          </PageWrapper>
-          <WhatsAppWidget />
+          <ConvexProviderClient>
+            <PageWrapper>
+              {children}
+            </PageWrapper>
+          </ConvexProviderClient>
         </ThemeProvider>
         <OrganizationJsonLd />
       </body>

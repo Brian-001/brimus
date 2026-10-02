@@ -3,8 +3,10 @@
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Moon, Sun, Menu, X, ArrowRight, ChevronDown } from "lucide-react";
+import { Moon, Sun, Menu, X, ArrowRight, ChevronDown, ShieldCheck } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useQuery } from "convex/react";
+import { api } from "@convex/_generated/api";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/ui/logo";
@@ -12,6 +14,7 @@ import { NAV_LINKS } from "@/lib/constants";
 import { services } from "@/lib/data";
 import { Sheet, SheetHeader, SheetClose } from "@/components/ui/sheet";
 import { ServicesMenu } from "@/components/sections/services-menu";
+import { useAuth } from "@/lib/use-auth";
 
 function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -46,6 +49,9 @@ export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
   const pathname = usePathname();
+  const { token, ready } = useAuth();
+  const me = useQuery(api.users.me, ready && token ? { token } : "skip");
+  const signedIn = !!me;
   const links = NAV_LINKS.filter((link) => link.href !== "/");
   const isActive = (href: string) =>
     href === "/about"
@@ -101,6 +107,13 @@ export function Header() {
           {/* Actions */}
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <Link
+              href={signedIn ? "/dashboard" : "/login"}
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-cyan-50/85 transition-colors hover:bg-white/10 hover:text-white"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              {signedIn ? "Dashboard" : "Login"}
+            </Link>
             <Link href="/contact" className="hidden lg:block">
               <Button
                 size="sm"

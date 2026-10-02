@@ -6,6 +6,8 @@ import { MapPin, Phone, Mail, Clock, Send, Navigation } from "lucide-react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useMutation } from "convex/react";
+import { api } from "@convex/_generated/api";
 import { SectionHeader } from "@/components/sections/stat-section";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -57,26 +59,28 @@ export default function ContactPage() {
   });
 
   const selectedServices = useWatch({ control, name: "services" }) ?? [];
+  const createInquiry = useMutation(api.inquires.create);
 
   const onSubmit = async (data: InquiryFormData) => {
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/inquiry", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+      await createInquiry({
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        company: data.company ? data.company : undefined,
+        services: data.services,
+        message: data.message,
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        setToast({ message: "Inquiry submitted successfully! We'll be in touch shortly.", type: "success" });
-        reset();
-      } else {
-        setToast({ message: result.message || "Something went wrong. Please try again.", type: "error" });
-      }
-    } catch {
-      setToast({ message: "Network error. Please check your connection and try again.", type: "error" });
+      setToast({ message: "Inquiry submitted successfully! We'll be in touch shortly.", type: "success" });
+      reset();
+    } catch (err) {
+      const message =
+        err instanceof Error && err.message
+          ? err.message
+          : "Something went wrong. Please try again.";
+      setToast({ message, type: "error" });
     } finally {
       setIsSubmitting(false);
     }

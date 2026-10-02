@@ -271,6 +271,16 @@
   animation: pulse-soft 6s ease-in-out infinite;
 }
 
+/* Top navigation progress bar (horizontal loader) */
+@keyframes progress-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+.animate-progress-slide {
+  animation: progress-slide 1.1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 /* Floating WhatsApp widget — one-shot entrance (wrapper only, so the inner
    <a> keeps its own hover/active transforms) */
 @keyframes wa-float-in {
