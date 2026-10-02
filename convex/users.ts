@@ -142,6 +142,17 @@ export const list = query({
   },
 });
 
+/** Authenticated: a single user by id (detail page), or null when not found. */
+export const getById = query({
+  args: { token: v.string(), id: v.id("users") },
+  handler: async (ctx, { token, id }) => {
+    const user = await getUserBySession(ctx, token);
+    if (!user) return null;
+    const target = await ctx.db.get(id);
+    return target ? publicUser(target) : null;
+  },
+});
+
 /** Authenticated: create an account with an initial password (managers only). */
 export const create = mutation({
   args: {

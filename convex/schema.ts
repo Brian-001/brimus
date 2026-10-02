@@ -20,6 +20,32 @@ export default defineSchema({
     .index("by_email", ["email"])
     .index("by_status", ["status", "submittedAt"]),
 
+  /**
+   * Answers/notes posted on an inquiry by dashboard users. An answered
+   * comment records how (method) the inquiry was answered; author fields are
+   * snapshotted so attribution survives account deletion.
+   */
+  inquiry_comments: defineTable({
+    inquiryId: v.id("inquires"),
+    userId: v.id("users"),
+    authorName: v.string(),
+    authorEmail: v.string(),
+    body: v.string(),
+    /** True when this comment records that the inquiry was answered. */
+    answered: v.boolean(),
+    /** How the inquiry was answered — required when answered is true. */
+    method: v.optional(
+      v.union(
+        v.literal("email"),
+        v.literal("phone"),
+        v.literal("meeting"),
+        v.literal("chat"),
+        v.literal("other"),
+      ),
+    ),
+    createdAt: v.number(),
+  }).index("by_inquiry", ["inquiryId"]),
+
   /** Insight articles (markdown bodies). */
   insights: defineTable({
     slug: v.string(),

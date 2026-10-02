@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as inquires from "../inquires.js";
+import type * as inquiryComments from "../inquiryComments.js";
 import type * as insights from "../insights.js";
 import type * as roles from "../roles.js";
 import type * as seedData from "../seedData.js";
@@ -24,6 +25,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   inquires: typeof inquires;
+  inquiryComments: typeof inquiryComments;
   insights: typeof insights;
   roles: typeof roles;
   seedData: typeof seedData;

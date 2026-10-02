@@ -136,7 +136,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         data-testid="nav-progress-bar"
         aria-hidden={!navLoading}
         className={cn(
-          "fixed inset-x-0 top-0 z-50 h-1 overflow-hidden transition-opacity duration-200",
+          "pointer-events-none fixed inset-x-0 top-0 z-50 h-1 overflow-hidden transition-opacity duration-200",
           navLoading ? "opacity-100" : "opacity-0",
         )}
       >
