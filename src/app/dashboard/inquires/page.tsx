@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
+import type { Id } from "@convex/_generated/dataModel";
 import { useAuth } from "@/lib/use-auth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { InquiriesSkeleton } from "@/components/dashboard/skeletons";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -13,40 +15,75 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Mail, Phone, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DataTable, type DataTableColumn } from "@/components/dashboard/data-table";
+import {
+  AnsweredBadge,
+  InquiryStatusBadge,
+} from "@/components/dashboard/status-badge";
+import { InquiriesSkeleton } from "@/components/dashboard/skeletons";
+import { Eye, MoreHorizontal, Search, Trash2 } from "lucide-react";
 
 type Status = "new" | "read" | "replied";
 
-const STATUS_STYLES: Record<Status, string> = {
-  new: "bg-amber-100 text-amber-800 ring-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:ring-amber-800",
-  read: "bg-sky-100 text-sky-800 ring-sky-200 dark:bg-sky-950 dark:text-sky-300 dark:ring-sky-800",
-  replied: "bg-emerald-100 text-emerald-800 ring-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:ring-emerald-800",
-};
+const STATUS_FILTERS: { value: string; label: string }[] = [
+  { value: "all", label: "All statuses" },
+  { value: "new", label: "New" },
+  { value: "read", label: "Read" },
+  { value: "replied", label: "Replied" },
+];
 
 export default function InquiresPage() {
+  const router = useRouter();
   const { token, ready } = useAuth();
   const authed = ready && token ? { token } : "skip";
   const inquires = useQuery(api.inquires.list, authed);
   const setStatus = useMutation(api.inquires.setStatus);
   const remove = useMutation(api.inquires.remove);
 
+  const [q, setQ] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: Id<"inquires">;
+    name: string;
+  } | null>(null);
+
   if (!inquires) {
     return <InquiriesSkeleton />;
   }
 
-  const onDelete = async (id: (typeof inquires)[number]["_id"]) => {
-    if (!confirm("Delete this inquiry? This cannot be undone.")) return;
-    try {
-      await remove({ token: token!, id });
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to delete");
-    }
-  };
+  const needle = q.trim().toLowerCase();
+  const filtered = inquires.filter((i) => {
+    const matchesQuery =
+      !needle ||
+      i.fullName.toLowerCase().includes(needle) ||
+      i.email.toLowerCase().includes(needle) ||
+      i.message.toLowerCase().includes(needle);
+    const matchesStatus = statusFilter === "all" || i.status === statusFilter;
+    return matchesQuery && matchesStatus;
+  });
 
-  const onStatus = async (
-    id: (typeof inquires)[number]["_id"],
-    status: Status,
-  ) => {
+  const onStatus = async (id: Id<"inquires">, status: Status) => {
     try {
       await setStatus({ token: token!, id, status });
     } catch (err) {
@@ -54,8 +91,93 @@ export default function InquiresPage() {
     }
   };
 
+  const onDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await remove({ token: token!, id: deleteTarget.id });
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete");
+    }
+    setDeleteTarget(null);
+  };
+
+  const columns: DataTableColumn<(typeof inquires)[number]>[] = [
+    {
+      key: "contact",
+      header: "Contact",
+      sortValue: (i) => i.fullName.toLowerCase(),
+      cell: (i) => (
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-foreground">
+            {i.fullName}
+          </p>
+          <p className="truncate text-xs text-muted-foreground">{i.email}</p>
+        </div>
+      ),
+    },
+    {
+      key: "services",
+      header: "Services",
+      headClassName: "hidden lg:table-cell",
+      cellClassName: "hidden lg:table-cell",
+      cell: (i) => (
+        <div className="flex max-w-[22rem] flex-wrap gap-1.5">
+          {i.services.slice(0, 2).map((service) => (
+            <span
+              key={service}
+              className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground ring-1 ring-border"
+            >
+              {service}
+            </span>
+          ))}
+          {i.services.length > 2 && (
+            <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground ring-1 ring-border">
+              +{i.services.length - 2}
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      sortValue: (i) => i.status,
+      cell: (i) => <InquiryStatusBadge status={i.status} />,
+    },
+    {
+      key: "resolution",
+      header: "Resolution",
+      sortValue: (i) => (i.answered ? 1 : 0),
+      cell: (i) =>
+        i.answered ? (
+          <AnsweredBadge />
+        ) : (
+          <span
+            data-testid="awaiting-badge"
+            className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground ring-1 ring-border"
+          >
+            Awaiting answer
+          </span>
+        ),
+    },
+    {
+      key: "received",
+      header: "Received",
+      sortValue: (i) => i.submittedAt,
+      headClassName: "hidden md:table-cell",
+      cellClassName: "hidden md:table-cell",
+      cell: (i) => (
+        <span className="whitespace-nowrap text-sm text-muted-foreground">
+          {new Date(i.submittedAt).toLocaleDateString(undefined, {
+            dateStyle: "medium",
+          })}
+        </span>
+      ),
+    },
+  ];
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Inquiries</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -63,97 +185,136 @@ export default function InquiresPage() {
         </p>
       </div>
 
-      {inquires.length === 0 ? (
-        <Card>
-          <CardContent className="py-10 text-center text-sm text-muted-foreground">
-            No inquiries yet. Submissions from the contact form will appear
-            here.
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {inquires.map((inquiry) => (
-            <Card key={inquiry._id}>
-              <CardHeader className="flex-row items-start justify-between space-y-0">
-                <div className="min-w-0">
-                  <CardTitle className="text-lg">{inquiry.fullName}</CardTitle>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {new Date(inquiry.submittedAt).toLocaleString()}
-                  </p>
-                </div>
-                <span
-                  className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ring-1 ${STATUS_STYLES[inquiry.status]}`}
-                >
-                  {inquiry.status}
-                </span>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-muted-foreground">
-                  <a
-                    href={`mailto:${inquiry.email}`}
-                    className="inline-flex items-center gap-1.5 hover:text-primary"
-                  >
-                    <Mail className="h-3.5 w-3.5" /> {inquiry.email}
-                  </a>
-                  <a
-                    href={`tel:${inquiry.phone}`}
-                    className="inline-flex items-center gap-1.5 hover:text-primary"
-                  >
-                    <Phone className="h-3.5 w-3.5" /> {inquiry.phone}
-                  </a>
-                  {inquiry.company && <span>· {inquiry.company}</span>}
-                </div>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {inquiry.services.map((service) => (
-                    <span
-                      key={service}
-                      className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground ring-1 ring-border"
-                    >
-                      {service}
-                    </span>
-                  ))}
-                </div>
-
-                <p className="whitespace-pre-wrap rounded-lg bg-secondary/50 px-3 py-2.5 text-sm text-foreground">
-                  {inquiry.message}
-                </p>
-
-                <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-muted-foreground">
-                      Status:
-                    </span>
-                    <Select
-                      value={inquiry.status}
-                      onValueChange={(value) =>
-                        onStatus(inquiry._id, value as Status)
-                      }
-                    >
-                      <SelectTrigger className="h-8 w-32 text-xs">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="new">New</SelectItem>
-                        <SelectItem value="read">Read</SelectItem>
-                        <SelectItem value="replied">Replied</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onDelete(inquiry._id)}
-                    className="text-muted-foreground hover:text-red-600"
-                  >
-                    <Trash2 className="h-4 w-4" /> Delete
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative w-full max-w-xs">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            className="pl-9"
+            placeholder="Search inquiries…"
+            aria-label="Search inquiries"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            data-testid="search-input"
+          />
         </div>
-      )}
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="h-10 w-40" data-testid="status-filter">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {STATUS_FILTERS.map((f) => (
+              <SelectItem key={f.value} value={f.value}>
+                {f.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <span className="text-xs text-muted-foreground">
+          {filtered.length} of {inquires.length}{" "}
+          {inquires.length === 1 ? "inquiry" : "inquiries"}
+        </span>
+      </div>
+
+      <DataTable
+        label="Inquiries"
+        columns={columns}
+        rows={filtered}
+        getRowId={(i) => i._id}
+        onRowClick={(i) => router.push(`/dashboard/inquires/${i._id}`)}
+        defaultSort={{ key: "received", dir: "desc" }}
+        empty={
+          needle || statusFilter !== "all" ? (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <Search className="h-8 w-8 opacity-50" />
+              <p className="text-sm">No inquiries match your filters.</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+              <Search className="h-8 w-8 opacity-50" />
+              <p className="text-sm">
+                No inquiries yet. Submissions from the contact form will appear
+                here.
+              </p>
+            </div>
+          )
+        }
+        rowActions={(i) => (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground"
+                aria-label={`Actions for ${i.fullName}`}
+                data-testid="row-actions"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => router.push(`/dashboard/inquires/${i._id}`)}
+              >
+                <Eye /> View details
+              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Mark as</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuLabel>Status</DropdownMenuLabel>
+                  {(["new", "read", "replied"] as Status[]).map((s) => (
+                    <DropdownMenuItem
+                      key={s}
+                      onSelect={() => onStatus(i._id, s)}
+                      data-testid={`status-${s}`}
+                    >
+                      <span className="capitalize">{s}</span>
+                      {i.status === s && (
+                        <span className="ml-auto text-xs text-primary">✓</span>
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() =>
+                  setDeleteTarget({ id: i._id, name: i.fullName })
+                }
+              >
+                <Trash2 /> Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      />
+
+      <AlertDialog
+        open={deleteTarget !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete inquiry from {deleteTarget?.name}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes this submission. This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-white hover:bg-destructive/90"
+              onClick={onDelete}
+              data-testid="confirm-delete"
+            >
+              Delete inquiry
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

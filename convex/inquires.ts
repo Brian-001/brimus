@@ -47,13 +47,48 @@ export const create = mutation({
   },
 });
 
-/** Authenticated: all inquiries, newest first. Null when not signed in. */
+/** Authenticated: all inquiries, newest first, each annotated with answer info from its comments. Null when not signed in. */
 export const list = query({
   args: { token: v.string() },
   handler: async (ctx, { token }) => {
     const user = await getUserBySession(ctx, token);
     if (!user) return null;
-    return await ctx.db.query("inquires").order("desc").collect();
+    const inquires = await ctx.db.query("inquires").order("desc").collect();
+    const comments = await ctx.db.query("inquiry_comments").collect();
+
+    const byInquiry = new Map<string, typeof comments>();
+    for (const c of comments) {
+      const arr = byInquiry.get(c.inquiryId);
+      if (arr) arr.push(c);
+      else byInquiry.set(c.inquiryId, [c]);
+    }
+
+    return inquires.map((inquiry) => {
+      const cs = byInquiry.get(inquiry._id);
+      let answered = false;
+      let answeredAt: number | undefined;
+      let answeredBy: string | undefined;
+      let method: string | undefined;
+      for (const c of cs ? [...cs].sort((a, b) => a.createdAt - b.createdAt) : []) {
+        if (c.answered) {
+          answered = true;
+          answeredAt = c.createdAt;
+          answeredBy = c.authorName;
+          method = c.method;
+        }
+      }
+      return { ...inquiry, answered, answeredAt, answeredBy, method };
+    });
+  },
+});
+
+/** Authenticated: a single inquiry by id (detail page), or null when not found. */
+export const getById = query({
+  args: { token: v.string(), id: v.id("inquires") },
+  handler: async (ctx, { token, id }) => {
+    const user = await getUserBySession(ctx, token);
+    if (!user) return null;
+    return await ctx.db.get(id);
   },
 });
 
