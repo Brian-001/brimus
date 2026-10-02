@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useQuery, useMutation } from "convex/react";
+import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { api } from "@convex/_generated/api";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { Sheet, SheetClose } from "@/components/ui/sheet";
 import { useAuth } from "@/lib/use-auth";
 import { ForcePasswordChange } from "@/components/dashboard/force-password-change";
 import { ROLE_LABELS } from "@convex/roles";
@@ -16,9 +18,13 @@ import {
   Inbox,
   ExternalLink,
   LogOut,
+  Menu,
+  Moon,
   ShieldCheck,
+  Sun,
   User,
   Users,
+  X,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -28,6 +34,35 @@ const NAV_ITEMS = [
   { href: "/dashboard/users", label: "Users", icon: Users, exact: true },
   { href: "/dashboard/profile", label: "Profile", icon: User, exact: true },
 ];
+
+function ThemeToggle() {
+  const { resolvedTheme, setTheme } = useTheme();
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+
+  return (
+    <button
+      type="button"
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      aria-label="Toggle theme"
+      title="Toggle theme"
+      data-testid="theme-toggle"
+      className={cn(
+        buttonVariants({ variant: "ghost", size: "icon" }),
+        "h-9 w-9 text-muted-foreground",
+      )}
+    >
+      {mounted && resolvedTheme === "dark" ? (
+        <Sun className="h-4 w-4" />
+      ) : (
+        <Moon className="h-4 w-4" />
+      )}
+    </button>
+  );
+}
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
@@ -68,6 +103,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const logoutMutation = useMutation(api.users.logout);
   const [signingOut, setSigningOut] = useState(false);
   const [navLoading, setNavLoading] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navStartedAt = useRef(0);
   const mainRef = useRef<HTMLElement>(null);
 
@@ -162,15 +198,28 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="shrink-0 border-b border-border bg-card/95 backdrop-blur">
           <div className="flex h-14 items-center gap-3 px-4">
-            {/* Mobile brand (desktop shows it in the sidebar) */}
-            <Link href="/dashboard" className="flex items-center gap-2 md:hidden">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <ShieldCheck className="h-5 w-5" />
-              </span>
-              <span className="text-sm font-bold text-foreground">Brimus Admin</span>
-            </Link>
+            {/* Mobile: hamburger + brand (desktop shows brand in the sidebar) */}
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground md:hidden"
+                aria-label="Open menu"
+                data-testid="mobile-menu-trigger"
+                onClick={() => setMobileMenuOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <Link href="/dashboard" className="flex items-center gap-2 md:hidden">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <ShieldCheck className="h-5 w-5" />
+                </span>
+                <span className="text-sm font-bold text-foreground">Brimus Admin</span>
+              </Link>
+            </div>
 
             <div className="ml-auto flex items-center gap-2">
+              <ThemeToggle />
               <Link
                 href="/dashboard/profile"
                 title="Your profile"
@@ -204,12 +253,46 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               </button>
             </div>
           </div>
-
-          {/* Mobile nav — horizontally scrollable */}
-          <nav className="flex gap-1 overflow-x-auto border-t border-border px-3 py-2 md:hidden">
-            <NavLinks onNavigate={beginNav} />
-          </nav>
         </header>
+
+        {/* Mobile navigation drawer — slides in from the left */}
+        <Sheet
+          open={mobileMenuOpen}
+          onOpenChange={setMobileMenuOpen}
+          label="Dashboard navigation"
+          className="inset-y-0 left-0 w-72 animate-drawer-in border-r border-border bg-card shadow-xl"
+        >
+          <div className="flex h-full flex-col" data-testid="nav-drawer">
+            <div className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4">
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2"
+              >
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <ShieldCheck className="h-5 w-5" />
+                </span>
+                <span className="text-sm font-bold text-foreground">
+                  Brimus Admin
+                </span>
+              </Link>
+              <SheetClose
+                aria-label="Close menu"
+                className="static text-muted-foreground"
+              >
+                <X className="h-5 w-5" />
+              </SheetClose>
+            </div>
+            <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+              <NavLinks
+                onNavigate={() => {
+                  beginNav();
+                  setMobileMenuOpen(false);
+                }}
+              />
+            </nav>
+          </div>
+        </Sheet>
 
         {/* Page content — scrolls independently of the sidebar */}
         <main ref={mainRef} className="min-w-0 flex-1 overflow-y-auto">

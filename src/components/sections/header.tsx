@@ -17,7 +17,7 @@ import { ServicesMenu } from "@/components/sections/services-menu";
 import { useAuth } from "@/lib/use-auth";
 
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const mounted = useSyncExternalStore(
     () => () => {},
     () => true,
@@ -25,9 +25,7 @@ function ThemeToggle() {
   );
 
   const toggleTheme = () => {
-    if (theme === "dark") setTheme("light");
-    else if (theme === "light") setTheme("dark");
-    else setTheme("dark");
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -35,8 +33,9 @@ function ThemeToggle() {
       onClick={toggleTheme}
       className="rounded-full p-2 text-cyan-50 transition-colors hover:bg-white/15 hover:text-white"
       aria-label="Toggle theme"
+      data-testid="theme-toggle"
     >
-      {mounted && theme === "dark" ? (
+      {mounted && resolvedTheme === "dark" ? (
         <Sun className="h-[1.2rem] w-[1.2rem]" />
       ) : (
         <Moon className="h-[1.2rem] w-[1.2rem]" />
@@ -140,7 +139,7 @@ export function Header() {
 
       {/* Mobile Nav */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <div className="fixed left-0 top-0 h-full w-72 overflow-y-auto border-r border-border bg-white shadow-xl dark:bg-cyan-950">
+        <div className="fixed left-0 top-0 h-full w-72 overflow-y-auto border-r border-border bg-white shadow-xl dark:bg-cyan-950 animate-drawer-in">
           <SheetHeader>
             <SheetClose
               aria-label="Close menu"

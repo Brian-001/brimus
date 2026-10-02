@@ -18,9 +18,11 @@ interface SheetProps {
   onOpenChange?: (open: boolean) => void;
   children: React.ReactNode;
   className?: string;
+  /** Accessible name for the dialog panel. */
+  label?: string;
 }
 
-export function Sheet({ open = false, onOpenChange, children, className }: SheetProps) {
+export function Sheet({ open = false, onOpenChange, children, className, label }: SheetProps) {
   const onClose = React.useCallback(() => onOpenChange?.(false), [onOpenChange]);
 
   React.useEffect(() => {
@@ -53,7 +55,7 @@ export function Sheet({ open = false, onOpenChange, children, className }: Sheet
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Site navigation"
+        aria-label={label ?? "Site navigation"}
         className={cn("fixed z-50 bg-background shadow-lg transition-all", className)}
       >
         {children}
