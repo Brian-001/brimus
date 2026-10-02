@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useAuth } from "@/lib/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InquiriesSkeleton } from "@/components/dashboard/skeletons";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -30,7 +31,7 @@ export default function InquiresPage() {
   const remove = useMutation(api.inquires.remove);
 
   if (!inquires) {
-    return <p className="text-sm text-muted-foreground">Loading inquiries…</p>;
+    return <InquiriesSkeleton />;
   }
 
   const onDelete = async (id: (typeof inquires)[number]["_id"]) => {

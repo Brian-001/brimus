@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { InsightsSkeleton } from "@/components/dashboard/skeletons";
 import { FileText, Pencil, Plus, Trash2 } from "lucide-react";
 
 export default function InsightsDashboardPage() {
@@ -18,7 +19,7 @@ export default function InsightsDashboardPage() {
   const seed = useMutation(api.insights.seed);
 
   if (!insights) {
-    return <p className="text-sm text-muted-foreground">Loading insights…</p>;
+    return <InsightsSkeleton />;
   }
 
   const onDelete = async (id: (typeof insights)[number]["_id"], title: string) => {

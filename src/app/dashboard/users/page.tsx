@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { UsersSkeleton } from "@/components/dashboard/skeletons";
 import { SubmitButton } from "@/components/ui/submit-button";
 import {
   Select,
@@ -45,7 +46,7 @@ export default function UsersPage() {
   const [busy, setBusy] = useState(false);
 
   if (!users || !me) {
-    return <p className="text-sm text-muted-foreground">Loading users…</p>;
+    return <UsersSkeleton />;
   }
 
   const canManage = canManageUsers(me.role);

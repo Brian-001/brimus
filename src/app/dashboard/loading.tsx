@@ -4,7 +4,13 @@
  */
 export default function DashboardLoading() {
   return (
-    <div className="animate-pulse space-y-6" aria-busy="true" aria-label="Loading page">
+    <div
+      role="status"
+      aria-busy="true"
+      data-testid="page-skeleton"
+      className="animate-pulse space-y-6"
+    >
+      <span className="sr-only">Loading page…</span>
       <div className="space-y-2">
         <div className="h-7 w-44 rounded-lg bg-secondary" />
         <div className="h-4 w-72 rounded bg-secondary" />

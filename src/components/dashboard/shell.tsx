@@ -67,6 +67,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const me = useQuery(api.users.me, ready && token ? { token } : "skip");
   const logoutMutation = useMutation(api.users.logout);
   const [signingOut, setSigningOut] = useState(false);
+  const [navLoading, setNavLoading] = useState(false);
+  const navStartedAt = useRef(0);
   const mainRef = useRef<HTMLElement>(null);
 
   const authorized = ready && !!token && me !== undefined && me !== null;
@@ -75,6 +77,23 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (denied && !signingOut) router.replace("/login");
   }, [denied, router, signingOut]);
+
+  // Horizontal top loader: shown from sidebar click until the route lands
+  // (with a short minimum hold so it never flickers on instant navigations).
+  const beginNav = () => {
+    navStartedAt.current = Date.now();
+    setNavLoading(true);
+  };
+
+  useEffect(() => {
+    if (!navLoading) return;
+    const hideAt = Math.max(navStartedAt.current + 550, Date.now() + 350);
+    const timer = setTimeout(
+      () => setNavLoading(false),
+      Math.max(0, hideAt - Date.now()),
+    );
+    return () => clearTimeout(timer);
+  }, [navLoading, pathname]);
 
   // The content column has its own scrollbar — reset it on navigation.
   useEffect(() => {
@@ -112,6 +131,19 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-dvh overflow-hidden bg-background">
+      {/* Horizontal navigation progress bar — spans the viewport above everything */}
+      <div
+        data-testid="nav-progress-bar"
+        aria-hidden={!navLoading}
+        className={cn(
+          "fixed inset-x-0 top-0 z-50 h-1 overflow-hidden transition-opacity duration-200",
+          navLoading ? "opacity-100" : "opacity-0",
+        )}
+      >
+        <div className="h-full w-full bg-primary/15" />
+        <div className="animate-progress-slide absolute inset-y-0 left-0 w-1/4 rounded-r-full bg-primary" />
+      </div>
+
       {/* Desktop sidebar — fixed rail with its own scrollbar */}
       <aside className="hidden w-52 shrink-0 flex-col border-r border-border bg-card md:flex">
         <div className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
@@ -123,7 +155,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
-          <NavLinks />
+          <NavLinks onNavigate={beginNav} />
         </nav>
       </aside>
 
@@ -175,7 +207,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
           {/* Mobile nav — horizontally scrollable */}
           <nav className="flex gap-1 overflow-x-auto border-t border-border px-3 py-2 md:hidden">
-            <NavLinks />
+            <NavLinks onNavigate={beginNav} />
           </nav>
         </header>
 

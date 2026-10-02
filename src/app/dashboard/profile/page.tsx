@@ -9,6 +9,7 @@ import { hashPassword } from "@/lib/crypto";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ProfileSkeleton } from "@/components/dashboard/skeletons";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { ROLE_LABELS } from "@convex/roles";
 import { CalendarDays, KeyRound, Mail, Save } from "lucide-react";
@@ -32,7 +33,7 @@ export default function ProfilePage() {
   const [busy, setBusy] = useState(false);
 
   if (!me) {
-    return <p className="text-sm text-muted-foreground">Loading profile…</p>;
+    return <ProfileSkeleton />;
   }
 
   const name = nameDraft ?? me.name;

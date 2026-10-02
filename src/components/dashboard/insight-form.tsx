@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { InsightFormSkeleton } from "@/components/dashboard/skeletons";
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -207,7 +208,7 @@ export function InsightForm({ id }: { id?: Id<"insights"> }) {
   );
 
   if (id && (!ready || post === undefined)) {
-    return <p className="text-sm text-muted-foreground">Loading article…</p>;
+    return <InsightFormSkeleton />;
   }
   if (id && post === null) {
     return (

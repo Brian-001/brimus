@@ -5,6 +5,7 @@ import { useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import { useAuth } from "@/lib/use-auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { OverviewSkeleton } from "@/components/dashboard/skeletons";
 import { AlertCircle, FileText, Inbox, Users } from "lucide-react";
 
 function StatCard({
@@ -54,7 +55,7 @@ export default function DashboardOverviewPage() {
   const users = useQuery(api.users.list, authed);
 
   if (!ready || !me || !inquires || !insights || !users) {
-    return <p className="text-sm text-muted-foreground">Loading overview…</p>;
+    return <OverviewSkeleton />;
   }
 
   const newCount = inquires.filter((i) => i.status === "new").length;
