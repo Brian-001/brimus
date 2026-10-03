@@ -46,6 +46,15 @@ import { Eye, MoreHorizontal, Search, Trash2 } from "lucide-react";
 
 type Status = "new" | "read" | "replied";
 
+/** Longest comment string shown in the Resolution column (ellipsis included). */
+const SNIPPET_MAX = 50;
+
+function commentSnippet(text: string) {
+  return text.length > SNIPPET_MAX
+    ? text.slice(0, SNIPPET_MAX - 1) + "…"
+    : text;
+}
+
 const STATUS_FILTERS: { value: string; label: string }[] = [
   { value: "all", label: "All statuses" },
   { value: "new", label: "New" },
@@ -147,18 +156,30 @@ export default function InquiresPage() {
     {
       key: "resolution",
       header: "Resolution",
-      sortValue: (i) => (i.answered ? 1 : 0),
-      cell: (i) =>
-        i.answered ? (
-          <AnsweredBadge />
-        ) : (
-          <span
-            data-testid="awaiting-badge"
-            className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground ring-1 ring-border"
-          >
-            Awaiting answer
-          </span>
-        ),
+      sortValue: (i) => (i.answered ? 2 : i.latestComment ? 1 : 0),
+      cell: (i) => (
+        <div className="min-w-0 max-w-[17rem] space-y-1">
+          {i.latestComment ? (
+            <>
+              <p
+                data-testid="resolution-snippet"
+                title={i.latestComment}
+                className="truncate text-sm text-foreground"
+              >
+                {commentSnippet(i.latestComment)}
+              </p>
+              {i.answered && <AnsweredBadge />}
+            </>
+          ) : (
+            <span
+              data-testid="awaiting-badge"
+              className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground ring-1 ring-border"
+            >
+              Awaiting answer
+            </span>
+          )}
+        </div>
+      ),
     },
     {
       key: "received",

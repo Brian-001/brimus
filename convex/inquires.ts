@@ -69,7 +69,9 @@ export const list = query({
       let answeredAt: number | undefined;
       let answeredBy: string | undefined;
       let method: string | undefined;
+      let latestComment: string | undefined;
       for (const c of cs ? [...cs].sort((a, b) => a.createdAt - b.createdAt) : []) {
+        latestComment = c.body;
         if (c.answered) {
           answered = true;
           answeredAt = c.createdAt;
@@ -77,7 +79,7 @@ export const list = query({
           method = c.method;
         }
       }
-      return { ...inquiry, answered, answeredAt, answeredBy, method };
+      return { ...inquiry, answered, answeredAt, answeredBy, method, latestComment };
     });
   },
 });
